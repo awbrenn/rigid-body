@@ -4,13 +4,11 @@
 
 #include "Mesh.h"
 
+
 bool Mesh::loadObj(std::string obj_filename) {
   bool succeeded = true;
   std::string line;
   std::ifstream obj_file(obj_filename);
-  std::vector<GLuv> temp_uvs;
-  std::vector<GLnormal> temp_normals;
-
 
   if (obj_file.is_open()) {
     // read through the file
@@ -20,60 +18,51 @@ bool Mesh::loadObj(std::string obj_filename) {
       line_stream >> type;
 
       if (type.compare("v") == 0) {
-        GLvertex vertex;
-        line_stream >> vertex.x >> vertex.y >> vertex.z;
-        vertices.push_back(vertex);
+        Vector3d position;
+        line_stream >> position.x >> position.y >> position.z;
+        vertex_positions.push_back(position);
 //        std::cout << vertex.x << " " << vertex.y << " " << vertex.z << std::endl;
       }
       else if (type.compare("vt") == 0) {
-        GLuv uv;
+        Vector2d uv;
         line_stream >> uv.x >> uv.y;
-        temp_uvs.push_back(uv);
+        vertex_uvs.push_back(uv);
 //        std::cout << uv.x << " " << uv.y << " " << std::endl;
       }
       else if (type.compare("vn") == 0) {
-        GLnormal normal;
+        Vector3d normal;
         line_stream >> normal.x >> normal.y >> normal.z;
-        temp_normals.push_back(normal);
+        vertex_normals.push_back(normal);
 //        std::cout << normal.x << " " << normal.y << " " << normal.z << std::endl;
       }
       else if (type.compare("f") == 0) {
-        unsigned int vertex_index[3], uv_index[3], normal_index[3];
+        unsigned int position_index[3], uv_index[3], normal_index[3];
         char delimiter;
-        line_stream >> vertex_index[0] >> delimiter >> uv_index[0] >> delimiter >> normal_index[0]
-                    >> vertex_index[1] >> delimiter >> uv_index[1] >> delimiter >> normal_index[1]
-                    >> vertex_index[2] >> delimiter >> uv_index[2] >> delimiter >> normal_index[2];
+        line_stream >> position_index[0] >> delimiter >> uv_index[0] >> delimiter >> normal_index[0]
+                    >> position_index[1] >> delimiter >> uv_index[1] >> delimiter >> normal_index[1]
+                    >> position_index[2] >> delimiter >> uv_index[2] >> delimiter >> normal_index[2];
 
 
-//        std::cout << vertex_index[0] << " " << uv_index[0] << " " << normal_index[0] << std::endl
-//                  << vertex_index[1] << " " << uv_index[1] << " " << normal_index[1] << std::endl
-//                  << vertex_index[2] << " " << uv_index[2] << " " << normal_index[2] << std::endl << std::endl;
+//        std::cout << position_index[0] << " " << uv_index[0] << " " << normal_index[0] << std::endl
+//                  << position_index[1] << " " << uv_index[1] << " " << normal_index[1] << std::endl
+//                  << position_index[2] << " " << uv_index[2] << " " << normal_index[2] << std::endl << std::endl;
 
-        GLface face = {
-                vertices[vertex_index[0]-1],
-                vertices[vertex_index[1]-1],
-                vertices[vertex_index[2]-1],
-                temp_normals[normal_index[0]-1],
-                temp_normals[normal_index[1]-1],
-                temp_normals[normal_index[2]-1],
-                temp_uvs[uv_index[0]-1],
-                temp_uvs[uv_index[1]-1],
-        };
-
-        GLfaces.push_back(face);
-
-        FaceIndices f_indices {
-                vertex_index[0] - 1,
-                vertex_index[1] - 1,
-                vertex_index[2] - 1
-        };
-
-        face_indices.push_back(f_indices);
+        // push back these three vertices
+        for (int i = 0; i < 3; ++i) {
+          vertices.push_back(Vertex(&vertex_positions[position_index[i]-1],
+                                    &vertex_uvs[position_index[i]-1],
+                                    &vertex_positions[position_index[i]-1]));
+        }
       }
     }
   }
   else {
     succeeded = false;
+  }
+
+  // add the faces
+  for (size_t i = 0; i < vertices.size(); i+=3) {
+    faces.push_back(Face(&vertices[i], &vertices[i+1], &vertices[i+2]));
   }
 
   return succeeded;

@@ -10,6 +10,8 @@
 
 #include "Camera.h"
 #include "Object.h"
+#include "RigidObject.h"
+#include "Solver.h"
 
 #ifdef __APPLE__
   #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -114,11 +116,11 @@ void drawMesh() {
   glPolygonMode(GL_FRONT, GL_LINE);
   glPolygonMode(GL_BACK, GL_LINE);
   glBegin(GL_TRIANGLES);
-  for (int i = 0; i < springy_object->mesh.GLfaces.size(); ++i) {
-    GLface face = springy_object->mesh.GLfaces[i];
+  for (int i = 0; i < rigid_object->mesh.faces.size(); ++i) {
+    Face face = rigid_object->mesh.faces[i];
     for (int j = 0; j < 3; ++j) {
-      glNormal3fv((GLfloat*)&face.vn[j]);
-      glVertex3fv((GLfloat*)&face.v[j]);
+      glNormal3f((GLfloat) face.v[j]->normal->x, (GLfloat) face.v[j]->normal->y, (GLfloat) face.v[j]->normal->z);
+      glVertex3f((GLfloat) face.v[j]->position->x, (GLfloat) face.v[j]->position->y, (GLfloat) face.v[j]->position->z);
     }
   }
   glEnd();
@@ -144,9 +146,9 @@ void perspDisplay() {
 }
 
 void stepSimulation() {
-  solver->update(INTEGRATOR, &springy_object->mesh, user_acceleration);
-  user_acceleration = Vector3d(0.0, 0.0, 0.0);
-  glutPostRedisplay();
+//  solver->update(INTEGRATOR, &rigid_object->mesh, user_acceleration);
+//  user_acceleration = Vector3d(0.0, 0.0, 0.0);
+//  glutPostRedisplay();
 }
 
 void mouseEventHandler(int button, int state, int x, int y) {
@@ -282,9 +284,7 @@ bool readParameters(char *paramfile_name) {
 
 //        std::cout << "mass: " << mass << " k: " << spring_constant << " d: " << damping_constant << std::endl;
 
-        springy_object = new SpringyObject(obj_filename, frag_shader_filename, vert_shader_filename, mass,
-                                           spring_constant, damping_constant, torsional_spring_constant,
-                                           torsional_damping_constant);
+        rigid_object = new RigidObject(obj_filename, frag_shader_filename, vert_shader_filename, mass);
       }
 
       else if (line.compare("SOLVER:") == 0) {
@@ -339,7 +339,7 @@ bool readParameters(char *paramfile_name) {
 
         solver_stream >> user_accel_magnitude;
 
-        solver = new Solver(&springy_object->spring_mesh, time_step, ground_plane,
+        solver = new Solver(&rigid_object->mesh, time_step, ground_plane,
                             coefficient_of_restitution, coefficient_of_friction);
       }
     }

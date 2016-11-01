@@ -1,15 +1,19 @@
 //
-// Created by awbrenn on 10/18/16.
+// Created by awbrenn on 11/1/16.
 //
 
-#ifndef SQUISHYMESH_FACE_H
-#define SQUISHYMESH_FACE_H
+#ifndef RIGIDBODY_FACE_H
+#define RIGIDBODY_FACE_H
+
+
+#include "Vertex.h"
 
 class Face {
   public:
-    unsigned int strut_indices[3]; // indices of struts
+    Vertex *v[3]; // vertices of face
 
-    Face(unsigned int strut_index1, unsigned int strut_index2, unsigned int strut_index3);
+    Face(Vertex *v0, Vertex *v1, Vertex *v2);
 };
 
-#endif //SQUISHYMESH_FACE_H
+
+#endif //RIGIDBODY_FACE_H
