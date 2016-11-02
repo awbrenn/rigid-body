@@ -8,12 +8,18 @@
 #include "RigidMesh.h"
 #include "Vector.h"
 #include "Mesh.h"
+#include "StateVector.h"
+#include "RigidObject.h"
 
-#define LEAPFROG 0
-#define SIXTH 4
+#define EULER 0
+#define RK4 4
 
 class Solver {
-  public:
+  private:
+    StateVector calculateStateDerivative(StateVector K);
+
+
+    public:
     Mesh *rigid_mesh;
     double ground_level;
     double coeff_of_restitution;
@@ -24,7 +30,9 @@ class Solver {
     Solver(Mesh *spring_mesh, double time_step, double ground_level, double coefficient_of_restitution,
            double coefficient_of_friction);
 
-    void update(unsigned int integrator, Vector3d user_acceleration);
+    void update(unsigned int integrator, RigidObject *rigid_object, Vector3d user_acceleration);
+    StateVector integrateEuler(StateVector K);
+    void integrateRK4(RigidObject* rigid_object);
 };
 
 

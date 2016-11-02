@@ -146,9 +146,9 @@ void perspDisplay() {
 }
 
 void stepSimulation() {
-//  solver->update(INTEGRATOR, &rigid_object->mesh, user_acceleration);
-//  user_acceleration = Vector3d(0.0, 0.0, 0.0);
-//  glutPostRedisplay();
+  solver->update(INTEGRATOR, rigid_object, user_acceleration);
+  user_acceleration = Vector3d(0.0, 0.0, 0.0);
+  glutPostRedisplay();
 }
 
 void mouseEventHandler(int button, int state, int x, int y) {
@@ -309,14 +309,14 @@ bool readParameters(char *paramfile_name) {
         std::string integration_type;
 
         solver_stream >> integration_type;
-        if (integration_type.compare("LEAPFROG") == 0) {
-          INTEGRATOR = LEAPFROG;
+        if (integration_type.compare("EULER") == 0) {
+          INTEGRATOR = EULER;
         }
-        else if (integration_type.compare("SIXTH") == 0) {
-          INTEGRATOR = SIXTH;
+        else if (integration_type.compare("RK4") == 0) {
+          INTEGRATOR = RK4;
         }
         else {
-          INTEGRATOR = SIXTH;
+          INTEGRATOR = RK4;
         }
 
         // skip a line

@@ -7,12 +7,16 @@
 
 #include "Object.h"
 #include "RigidMesh.h"
+#include "StateVector.h"
 
 class RigidObject : public Object {
   public:
     double mass;
+    StateVector *state;
 
     RigidObject(std::string obj_filename, std::string frag_shader_filename, std::string vert_shader_filename, double Mass);
+
+    void convertStateVectorToMesh();
 };
 
 

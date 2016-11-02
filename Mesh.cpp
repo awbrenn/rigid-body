@@ -4,7 +4,6 @@
 
 #include "Mesh.h"
 
-
 bool Mesh::loadObj(std::string obj_filename) {
   bool succeeded = true;
   std::string line;

@@ -8,4 +8,12 @@ RigidObject::RigidObject(std::string obj_filename, std::string frag_shader_filen
                          double Mass) : Object(obj_filename, frag_shader_filename, vert_shader_filename) {
 
   mass = Mass;
+  state = new StateVector(&mesh);
+}
+
+void RigidObject::convertStateVectorToMesh() {
+  // move the mesh positions to the proper place
+  for(int i = 0; i < state->N; ++i) {
+    mesh.vertex_positions[i] = state->values[i];
+  }
 }
