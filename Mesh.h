@@ -12,9 +12,15 @@
 #include "Vector.h"
 #include "Face.h"
 
+typedef struct FaceVertexIndex {
+  unsigned int position_index;
+  unsigned int uv_index;
+  unsigned int normal_index;
+} FaceVertexIndex;
+
 class Mesh {
   private:
-    void constructVertices();
+    std::vector<FaceVertexIndex> face_vertex_indices;
 
   public:
     std::vector<Vector3d> vertex_positions;
@@ -24,6 +30,7 @@ class Mesh {
     std::vector<Face> faces;
 
     bool loadObj(std::string obj_filename);
+    Mesh copy(); // return a copy of the mesh
 };
 
 

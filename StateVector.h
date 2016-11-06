@@ -6,23 +6,22 @@
 #define RIGIDBODY_STATEVECTOR_H
 
 #include <vector>
-#include "Vector.h"
 #include "Mesh.h"
+#include "Quaternion.h"
 #include <iostream>
 #include <ostream>
 
 class StateVector {
 
   public:
-    size_t N; // number of elements in StateVector
-    size_t size; // total size of the array
-    Vector3d* values; // number of elements in the StateVector
+    Vector3d x; // position
+    Quaternion q; // rotation embeded in a quaternion
+    Vector3d P; // momentum
+    Vector3d L; // angular momentum
 
     // constructor
-    StateVector(size_t number_of_elements=0);
-    StateVector(Mesh *mesh);
-
-    Vector3d& operator[](size_t i);
+    StateVector();
+    StateVector(Vector3d _x, Quaternion _q, Vector3d _P, Vector3d _L);
 
     // friend functions
     friend StateVector operator-(const StateVector& sv1, const StateVector& sv2); // subtraction
@@ -31,10 +30,6 @@ class StateVector {
     friend StateVector operator*(const StateVector& sv1, const double s); // scalar multiply from the other side
     friend StateVector operator/(const StateVector& sv1, const double s); // scalar division
     friend std::ostream& operator<< (std::ostream& os, const StateVector& sv);
-
-    // member functions
-    Vector3d at(size_t i);
-    void transferMeshToStateVector(Mesh *mesh);
 };
 
 

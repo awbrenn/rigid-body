@@ -12,7 +12,8 @@
 class RigidObject : public Object {
   public:
     double mass;
-    StateVector *state;
+    StateVector state;
+    Mesh displaced_mesh; // a mesh that is displaced by the simulation
 
     RigidObject(std::string obj_filename, std::string frag_shader_filename, std::string vert_shader_filename, double Mass);
 

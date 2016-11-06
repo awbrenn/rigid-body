@@ -8,12 +8,20 @@ RigidObject::RigidObject(std::string obj_filename, std::string frag_shader_filen
                          double Mass) : Object(obj_filename, frag_shader_filename, vert_shader_filename) {
 
   mass = Mass;
-  state = new StateVector(&mesh);
 }
 
 void RigidObject::convertStateVectorToMesh() {
-  // move the mesh positions to the proper place
-  for(int i = 0; i < state->N; ++i) {
-    mesh.vertex_positions[i] = state->values[i];
+  // start the displaced mesh off as the same as the regular mesh
+  displaced_mesh = mesh.copy();
+
+  // TODO rotate the mesh
+  for (auto p = displaced_mesh.vertex_positions.begin(); p < displaced_mesh.vertex_positions.end(); ++p) {
+    Matrix3x3 rotation_matrix = state.q.rotation();
+    *p = *p * rotation_matrix;
+  }
+
+  // TODO move the mesh
+  for (auto p = displaced_mesh.vertex_positions.begin(); p < displaced_mesh.vertex_positions.end(); ++p) {
+    *p = *p + state.x;
   }
 }

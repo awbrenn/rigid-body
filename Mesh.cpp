@@ -49,8 +49,15 @@ bool Mesh::loadObj(std::string obj_filename) {
         // push back these three vertices
         for (int i = 0; i < 3; ++i) {
           vertices.push_back(Vertex(&vertex_positions[position_index[i]-1],
-                                    &vertex_uvs[position_index[i]-1],
-                                    &vertex_positions[position_index[i]-1]));
+                                    &vertex_uvs[uv_index[i]-1],
+                                    &vertex_normals[normal_index[i]-1]));
+          FaceVertexIndex face_vertex_index = {
+                  position_index[i]-1,
+                  uv_index[i]-1,
+                  normal_index[i]-1
+          };
+
+          face_vertex_indices.push_back(face_vertex_index);
         }
       }
     }
@@ -65,4 +72,25 @@ bool Mesh::loadObj(std::string obj_filename) {
   }
 
   return succeeded;
+}
+
+Mesh Mesh::copy() {
+  Mesh copy;
+
+  copy.vertex_positions = vertex_positions;
+  copy.vertex_uvs = vertex_uvs;
+  copy.vertex_normals = vertex_normals;
+
+  for (auto vertex_index = face_vertex_indices.begin(); vertex_index < face_vertex_indices.end(); ++vertex_index) {
+    copy.vertices.push_back(Vertex(&copy.vertex_positions[vertex_index->position_index],
+                                   &copy.vertex_uvs[vertex_index->uv_index],
+                                   &copy.vertex_normals[vertex_index->normal_index]));
+  }
+
+  // add the faces
+  for (size_t i = 0; i < copy.vertices.size(); i+=3) {
+    copy.faces.push_back(Face(&copy.vertices[i], &copy.vertices[i+1], &copy.vertices[i+2]));
+  }
+
+  return copy;
 }

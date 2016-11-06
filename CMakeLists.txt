@@ -21,7 +21,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     find_library(GLU "GLU")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-set(SOURCE_FILES main.cpp Utility.cpp Camera.cpp Matrix.cpp Vector.cpp Mesh.cpp Mesh.h Object.cpp Object.h Face.cpp Face.h Shader.cpp Shader.h Solver.cpp Solver.h RigidMesh.cpp RigidMesh.h RigidObject.cpp RigidObject.h Vertex.cpp Vertex.h Vertex.cpp Vertex.h StateVector.cpp StateVector.h)
+set(SOURCE_FILES main.cpp Utility.cpp Camera.cpp Matrix.cpp Vector.cpp Mesh.cpp Mesh.h Object.cpp Object.h Face.cpp Face.h Shader.cpp Shader.h Solver.cpp Solver.h RigidMesh.cpp RigidMesh.h RigidObject.cpp RigidObject.h Vertex.cpp Vertex.h Vertex.cpp Vertex.h StateVector.cpp StateVector.h Quaternion.cpp Quaternion.h)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
