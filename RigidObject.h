@@ -10,14 +10,19 @@
 #include "StateVector.h"
 
 class RigidObject : public Object {
+  private:
+    unsigned int pinned_vertex_index; // a vertex that is pinned for the simulation.
+
   public:
     double mass;
     StateVector state;
     Mesh displaced_mesh; // a mesh that is displaced by the simulation
 
-    RigidObject(std::string obj_filename, std::string frag_shader_filename, std::string vert_shader_filename, double Mass);
+    RigidObject(std::string obj_filename, std::string frag_shader_filename, std::string vert_shader_filename,
+                    double Mass, unsigned int Pinned_vertex_index);
 
     void convertStateVectorToMesh();
+    Vector3d getPinPosition();
 };
 
 

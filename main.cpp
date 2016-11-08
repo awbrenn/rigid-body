@@ -31,6 +31,10 @@ Solver *solver;
 unsigned int INTEGRATOR;
 Vector3d user_acceleration;
 double user_accel_magnitude;
+bool simulation_paused = false;
+
+// TODO remove this
+bool first_run = true;
 
 bool showReferenceGrid = true;
 
@@ -111,6 +115,61 @@ void initCameraRender() {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+void drawDebug() {
+  Vector3d gravity(0.0, -9.8, 0.0);
+  Vector3d spring_force(0.0, 0.0, 0.0);
+  double spring_constant = 200.0;
+  Vector3d line_anchor(0.0, 0.0, 0.0);
+  double line_length = 2.0;
+  Vector3d rigid_body_pin_position = rigid_object->getPinPosition();
+  Vector3d r = (rigid_body_pin_position - rigid_object->state.x).normalize(); // unit vector from rigid body position to pinned point on rigid body
+  Vector3d l = (line_anchor - rigid_body_pin_position).normalize(); // unit vector in the direction of the anchor from the pin
+
+  if (rigid_body_pin_position.norm() > line_length) {
+    spring_force = spring_constant * ((rigid_body_pin_position.norm() - line_length) * l);
+  }
+
+  Vector3d body_force = (gravity + ((spring_force * r) * l)) * rigid_object->mass;
+
+  glColor3f(0.1, 0.2, 0.7);
+  glBegin(GL_LINES);
+  glVertex3f(rigid_object->state.x.x, rigid_object->state.x.y, rigid_object->state.x.z);
+  glVertex3f(rigid_object->state.x.x + r.x, rigid_object->state.x.y + r.y, rigid_object->state.x.z + r.z);
+  glEnd();
+
+  glColor3f(0.7, .7, 0.1);
+  glBegin(GL_LINES);
+  glVertex3f(rigid_body_pin_position.x, rigid_body_pin_position.y, rigid_body_pin_position.z);
+  glVertex3f(rigid_body_pin_position.x + l.x, rigid_body_pin_position.y + l.y, rigid_body_pin_position.z + l.z);
+  glEnd();
+
+  glColor3f(1.0, .2, 0.2);
+  glBegin(GL_LINES);
+  glVertex3f(rigid_body_pin_position.x, rigid_body_pin_position.y, rigid_body_pin_position.z);
+  glVertex3f(rigid_body_pin_position.x + spring_force.x, rigid_body_pin_position.y + spring_force.y, rigid_body_pin_position.z + spring_force.z);
+  glEnd();
+
+//  glColor3f(1.0, .2, 0.2);
+//  glBegin(GL_LINES);
+//  glVertex3f(rigid_body_pin_position.x, rigid_body_pin_position.y, rigid_body_pin_position.z);
+//  glVertex3f(rigid_body_pin_position.x + spring_force.x, rigid_body_pin_position.y + spring_force.y, rigid_body_pin_position.z + spring_force.z);
+//  glEnd();
+
+  glColor3f(1.0, 0.0, 0.0);
+  glPointSize(3.0);
+  glBegin(GL_POINTS);
+  glVertex3f(rigid_body_pin_position.x, rigid_body_pin_position.y, rigid_body_pin_position.z);
+  glEnd();
+
+  glColor3f(0.0, 1.0, 3.0);
+  glPointSize(3.0);
+  glBegin(GL_POINTS);
+  glVertex3f(0.0, 0.0, 0.0);
+  glEnd();
+
+  glColor3f(0.0, 0.0, 0.0);
+}
+
 void drawMesh() {
 //  glUseProgram(springy_object->shader->program);
   glPolygonMode(GL_FRONT, GL_LINE);
@@ -141,14 +200,22 @@ void perspDisplay() {
 
   drawMesh();
 
+  if (!first_run) {
+    drawDebug();
+  }
+
+  first_run = false;
+
   glFlush();
   glutSwapBuffers();
 }
 
 void stepSimulation() {
-  solver->update(INTEGRATOR, user_acceleration);
-  user_acceleration = Vector3d(0.0, 0.0, 0.0);
-  glutPostRedisplay();
+  if (not simulation_paused) {
+    solver->update(INTEGRATOR, user_acceleration);
+    user_acceleration = Vector3d(0.0, 0.0, 0.0);
+    glutPostRedisplay();
+  }
 }
 
 void mouseEventHandler(int button, int state, int x, int y) {
@@ -196,7 +263,7 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
       break;
 
     case 'p': case 'P':
-      // render the particles as points
+      simulation_paused = !simulation_paused;
       ;
       break;
 
@@ -235,11 +302,8 @@ bool readParameters(char *paramfile_name) {
     while (getline(paramfile_stream, line)) {
 
       if (line.compare("SPRINGY OBJECT:") == 0) {
-        double mass,                       // mass of the object
-               spring_constant,            // spring time constant
-               damping_constant,           // damper time constant
-               torsional_spring_constant,  // spring constant of the torsional springs
-               torsional_damping_constant; // damping constant of the torsional springs
+        double mass;
+        unsigned int pin_vertex_index;
         std::string obj_filename;
         std::string frag_shader_filename;
         std::string vert_shader_filename;
@@ -270,34 +334,28 @@ bool readParameters(char *paramfile_name) {
         object_stream.str(line);
         object_stream.clear();
 
-        object_stream >> mass >> spring_constant >> damping_constant;
-
-        // skip a line
-        getline(paramfile_stream, line);
-        getline(paramfile_stream, line);
-        getline(paramfile_stream, line);
-
-        object_stream.str(line);
-        object_stream.clear();
-
-        object_stream >> torsional_spring_constant >> torsional_damping_constant;
+        object_stream >> mass >> pin_vertex_index;
 
 //        std::cout << "mass: " << mass << " k: " << spring_constant << " d: " << damping_constant << std::endl;
 
-        rigid_object = new RigidObject(obj_filename, frag_shader_filename, vert_shader_filename, mass);
+        // TODO add rigid_index_number to parameters
+        rigid_object = new RigidObject(obj_filename, frag_shader_filename, vert_shader_filename, mass, pin_vertex_index);
       }
 
       else if (line.compare("SOLVER:") == 0) {
         double time_step,
                ground_plane,
-               coefficient_of_restitution,
-               coefficient_of_friction;
+               spring_constant,
+               line_length;
+        unsigned int substeps;
+        Vector3d line_anchor_point;
+
         // skip a line
         getline(paramfile_stream, line);
 
         getline(paramfile_stream, line);
         std::stringstream solver_stream(line);
-        solver_stream >> time_step;
+        solver_stream >> time_step >> substeps;
 
         // skip a line
         getline(paramfile_stream, line);
@@ -327,7 +385,9 @@ bool readParameters(char *paramfile_name) {
         solver_stream.str(line);
         solver_stream.clear();
 
-        solver_stream >> ground_plane >> coefficient_of_restitution >> coefficient_of_friction;
+        solver_stream >> ground_plane >> spring_constant >> line_length >> line_anchor_point.x >>
+                                                                           line_anchor_point.y >>
+                                                                           line_anchor_point.z;
 
         // skip a line
         getline(paramfile_stream, line);
@@ -339,7 +399,8 @@ bool readParameters(char *paramfile_name) {
 
         solver_stream >> user_accel_magnitude;
 
-        solver = new Solver(rigid_object, time_step, ground_plane, coefficient_of_restitution, coefficient_of_friction);
+        solver = new Solver(rigid_object, time_step, substeps, ground_plane, spring_constant,
+                            line_length, line_anchor_point);
       }
     }
   }

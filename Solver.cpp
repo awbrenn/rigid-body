@@ -4,38 +4,33 @@
 
 #include "Solver.h"
 
-Solver::Solver(RigidObject *Rigid_object, double time_step, double Ground_level, double Coefficient_of_restitution,
-               double Coefficient_of_friction) {
+Solver::Solver(RigidObject *Rigid_object, double time_step, unsigned int Substeps, double Ground_level,
+               double Spring_constant, double Line_length, Vector3d Line_anchor) {
   rigid_object = Rigid_object;
   dt = time_step;
+  substeps = Substeps;
   ground_level = Ground_level;
-  coeff_of_restitution = Coefficient_of_restitution;
-  coeff_of_friction = Coefficient_of_friction;
-}
-
-
-// calculate the forces that act on only a portion of the mesh
-Vector3d Solver::calculateLocalForce(StateVector K) {
-  return Vector3d(0.0, 0.0, 0.0);
+  spring_constant = Spring_constant;
+  line_length = Line_length;
+  line_anchor_point = Line_anchor;
 }
 
 
 // calculate the forces that act on the whole body (like gravity)
-Vector3d Solver::calculateBodyForce(StateVector K) {
-  Vector3d body_force;
+void Solver::calculateForce(StateVector K, Vector3d *body_force, Vector3d *local_force) {
   Vector3d gravity(0.0, -9.8, 0.0);
+  Vector3d spring_force(0.0, 0.0, 0.0);
 
+  Vector3d rigid_body_pin_position = rigid_object->getPinPosition();
+  Vector3d r = (rigid_body_pin_position - K.x).normalize(); // unit vector from rigid body position to pinned point on rigid body
+  Vector3d l = (line_anchor_point - rigid_body_pin_position).normalize(); // unit vector in the direction of the anchor from the pin
 
-//  Vector3d line_anchor(0.0, 0.0, 0.0);
-//  double line_length = 2.0;
-//
-//  if (K.x.norm() > line_length) {
-//    Vector3d
-//  }
+  if (rigid_body_pin_position.norm() > line_length) {
+    spring_force = spring_constant * ((rigid_body_pin_position.norm() - line_length) * l);
+  }
 
-  body_force = gravity * rigid_object->mass;
-
-  return body_force;
+  *body_force = (gravity + spring_force) * rigid_object->mass;
+  *local_force = (spring_force % r) * rigid_object->mass;
 }
 
 
@@ -44,13 +39,18 @@ StateVector Solver::calculateStateDerivative(StateVector K) {
   Vector3d local_force(0.0, 0.0, 0.0);
   StateVector dK;
 
-  body_force = calculateBodyForce(K);
-  local_force = calculateLocalForce(K);
+  calculateForce(K, &body_force, &local_force);
+
+  // get the angular velocity
+  Matrix3x3 I; // identity matrix
+  I.identity();
+
+  Vector3d w = I.transpose() * K.L;
 
   dK.x = (1.0 / rigid_object->mass) * (K.P);
-//  dK.q = 0.5 * w * K.q;
-  dK.P = body_force + local_force;
-//  dK.L = r * local_force;
+  dK.q = 0.5 * w * K.q;
+  dK.P = body_force;
+  dK.L = local_force;
 
   return dK;
 }
@@ -77,6 +77,8 @@ void Solver::integrateRK4() {
 void Solver::update(unsigned int integrator, Vector3d User_acceleration) {
   user_acceleration = User_acceleration;
 
+  rigid_object->convertStateVectorToMesh();
+
   switch(integrator) {
     case EULER:
       break;
@@ -86,6 +88,4 @@ void Solver::update(unsigned int integrator, Vector3d User_acceleration) {
     default:
       break;
   }
-
-  rigid_object->convertStateVectorToMesh();
 }

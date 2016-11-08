@@ -16,21 +16,22 @@
 
 class Solver {
   private:
-    Vector3d calculateLocalForce(StateVector K);
-    Vector3d calculateBodyForce(StateVector K);
+    void calculateForce(StateVector K, Vector3d *body_force, Vector3d *local_force);
     StateVector calculateStateDerivative(StateVector K);
 
 
     public:
       RigidObject *rigid_object;
       double ground_level;
-      double coeff_of_restitution;
-      double coeff_of_friction;
+      double spring_constant;
+      double line_length;
+      Vector3d line_anchor_point;
       Vector3d user_acceleration;
       double dt; // timestep (dt for delta time per step)
+      unsigned int substeps; // sub steps
 
-      Solver(RigidObject *rigid_object, double time_step, double ground_level, double coefficient_of_restitution,
-                 double coefficient_of_friction);
+      Solver(RigidObject *rigid_object, double time_step, unsigned int substeps, double ground_level,
+                   double spring_constant, double Line_length, Vector3d Line_anchor);
 
       void update(unsigned int integrator, Vector3d user_acceleration);
       StateVector integrateEuler(StateVector K);
