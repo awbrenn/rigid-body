@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 class Shader {
   private:

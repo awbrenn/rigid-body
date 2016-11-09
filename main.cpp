@@ -218,10 +218,13 @@ void drawBungeeLine() {
 
 void drawMesh() {
   glUseProgram(rigid_object->shader->program);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, 0);
   glBegin(GL_TRIANGLES);
   for (int i = 0; i < rigid_object->displaced_mesh.faces.size(); ++i) {
     Face face = rigid_object->displaced_mesh.faces[i];
     for (int j = 0; j < 3; ++j) {
+      glTexCoord2f((GLfloat) face.v[j]->uv->x, (GLfloat) face.v[j]->uv->y);
       glNormal3f((GLfloat) face.v[j]->normal->x, (GLfloat) face.v[j]->normal->y, (GLfloat) face.v[j]->normal->z);
       glVertex3f((GLfloat) face.v[j]->position->x, (GLfloat) face.v[j]->position->y, (GLfloat) face.v[j]->position->z);
     }

@@ -9,6 +9,41 @@ Shader::Shader(char *frag, char *vert) {
   program = loadShaders(frag, vert);
 }
 
+void load_diffuse_texture(char *filename) {
+  FILE *fptr;
+  char buf[512], *parse;
+  int im_size, im_width, im_height, max_color;
+  unsigned char *texture_bytes;
+
+  fptr=fopen(filename,"r");
+  fgets(buf,512,fptr);
+  do{
+    fgets(buf,512,fptr);
+  } while(buf[0]=='#');
+  parse = (char *)strtok(buf," \t");
+  im_width = atoi(parse);
+
+  parse = (char *)strtok(NULL," \n");
+  im_height = atoi(parse);
+
+  fgets(buf,512,fptr);
+  parse = (char *)strtok(buf," \n");
+  max_color = atoi(parse);
+
+  im_size = im_width*im_height;
+  texture_bytes = (unsigned char *)calloc(3,im_size);
+  fread(texture_bytes,3,im_size,fptr);
+  fclose(fptr);
+
+  glBindTexture(GL_TEXTURE_2D,0);
+  glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,im_width,im_height,0,GL_RGB,
+               GL_UNSIGNED_BYTE,texture_bytes);
+  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+  glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+  glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+  free(texture_bytes);
+}
+
 char* Shader::readShaderProgram(char *filename) {
   FILE *fp;
   char *content = NULL;
@@ -76,11 +111,13 @@ unsigned int Shader::loadShaders(char* frag, char* vert) {
       exit(EXIT_FAILURE);
   }
 
-//  glUseProgram(p);
-//  setUniformParameter(p, (char *) "myDiffuse", 0);
+  load_diffuse_texture((char *) "/home/awbrenn/Documents/workspace/physanim/5/dhouse_diffuse.ppm");
+
+  glUseProgram(p);
+  setUniformParameter(p, (char *) "myDiffuse", 0);
 //  setUniformParameter(p, (char *) "myNormal", 1);
 //  setUniformParameter(p, (char *) "mySpecular", 2);
 //  setUniformParameter(p, (char *) "myShadow", 3);
-
+  glUseProgram(0);
   return p;
 }
