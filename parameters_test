@@ -6,7 +6,7 @@ RIGID OBJECT:
             /home/awbrenn/Documents/workspace/physanim/5/shader.frag    /home/awbrenn/Documents/workspace/physanim/5/shader.vert
 
         mass (m) [kg], pin vertex (index of the vertex position to pin)
-                 0.4           96
+                  0.5           96
 
 SOLVER:
         timestep (change in time between each simulation step), substeps (number of times the solver is run per render)
@@ -16,7 +16,7 @@ SOLVER:
             RK4
 
         ground level, spring constant (k) [N/m], line length [m], line anchor point (x y z) [m]
-                0.0                        3              15.5                    0.0 0.0 0.0
+                0.0                        1              2.5                    0.0 0.0 0.0
 
         magnitude of user acceleration
                                   13.0

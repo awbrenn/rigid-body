@@ -204,6 +204,18 @@ void drawMeshDebug() {
   }
 }
 
+void drawBungeeLine() {
+  Vector3d bungee_line = rigid_object->getPinPosition() - solver->line_anchor_point;
+
+  glBegin(GL_LINES);
+  glVertex3f((GLfloat) solver->line_anchor_point.x, (GLfloat) solver->line_anchor_point.y,
+             (GLfloat) solver->line_anchor_point.z);
+  glVertex3f((GLfloat) (solver->line_anchor_point.x + bungee_line.x),
+             (GLfloat) (solver->line_anchor_point.y + bungee_line.y),
+             (GLfloat) (solver->line_anchor_point.z + bungee_line.z));
+  glEnd();
+}
+
 void drawMesh() {
   glUseProgram(rigid_object->shader->program);
   glBegin(GL_TRIANGLES);
@@ -239,6 +251,9 @@ void perspDisplay() {
   }
   else {
     drawMesh();
+    if (!first_run) {
+      drawBungeeLine();
+    }
   }
 
   first_run = false;

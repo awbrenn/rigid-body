@@ -66,9 +66,9 @@ void Solver::integrateRK4() {
 
   // calculate the forces on the particles
   K1 = calculateStateDerivative(rigid_object->state);
-  K2 = calculateStateDerivative((rigid_object->state) + ((dt / 2.0) * K1));
-  K3 = calculateStateDerivative((rigid_object->state) + ((dt / 2.0) * K2));
-  K4 = calculateStateDerivative((rigid_object->state) + (dt * K3));
+  K2 = calculateStateDerivative(rigid_object->state + ((dt / 2.0) * K1));
+  K3 = calculateStateDerivative(rigid_object->state + ((dt / 2.0) * K2));
+  K4 = calculateStateDerivative(rigid_object->state + (dt * K3));
 
   rigid_object->state = (rigid_object->state) + ((dt / 6.0) * (K1 + (2*K2) + (2*K3) + K4));
 }
