@@ -1,22 +1,22 @@
-SPRINGY OBJECT:
+RIGID OBJECT:
         obj path and filename
-        /home/awbrenn/Documents/workspace/physanim/5/sphere_hires.obj
+        /home/awbrenn/Documents/workspace/physanim/5/dr_house.obj
 
         fragment shader                                                 vertex shader
             /home/awbrenn/Documents/workspace/physanim/5/shader.frag    /home/awbrenn/Documents/workspace/physanim/5/shader.vert
 
         mass (m) [kg], pin vertex (index of the vertex position to pin)
-                 0.9            7
+                 0.4           96
 
 SOLVER:
         timestep (change in time between each simulation step), substeps (number of times the solver is run per render)
-           0.01                                                       5
+           0.01                                                        5
 
         integrator (choose from LEAPFROG and SIXTH)
             RK4
 
         ground level, spring constant (k) [N/m], line length [m], line anchor point (x y z) [m]
-                -5.0                        2.0              7.5                    0.0 0.0 0.0
+                0.0                        3              15.5                    0.0 0.0 0.0
 
         magnitude of user acceleration
                                   13.0

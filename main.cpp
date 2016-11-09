@@ -36,7 +36,9 @@ bool simulation_paused = false;
 // TODO remove this
 bool first_run = true;
 
-bool showReferenceGrid = true;
+bool showReferenceGrid = false;
+bool showNormals = false;
+bool showDebugMode = false;
 
 // draws a simple grid
 void drawReferenceGrid() {
@@ -91,6 +93,7 @@ void initCameraDebug() {
 
   // grey background for window
   glClearColor(0.62, 0.62, 0.62, 0.0f);
+//  glClearColor(0.0, 0.0, 0.0, 0.0f);
   glShadeModel(GL_SMOOTH);
   glDepthRange(0.0f, 1.0f);
 
@@ -128,8 +131,6 @@ void drawDebug() {
   if (rigid_body_pin_position.norm() > line_length) {
     spring_force = spring_constant * ((rigid_body_pin_position.norm() - line_length) * l);
   }
-
-  Vector3d body_force = (gravity + ((spring_force * r) * l)) * rigid_object->mass;
 
   glColor3f(0.1, 0.2, 0.7);
   glBegin(GL_LINES);
@@ -170,8 +171,7 @@ void drawDebug() {
   glColor3f(0.0, 0.0, 0.0);
 }
 
-void drawMesh() {
-//  glUseProgram(springy_object->shader->program);
+void drawMeshDebug() {
   glPolygonMode(GL_FRONT, GL_LINE);
   glPolygonMode(GL_BACK, GL_LINE);
   glBegin(GL_TRIANGLES);
@@ -185,6 +185,37 @@ void drawMesh() {
   glEnd();
   glPolygonMode(GL_FRONT, GL_FILL);
   glPolygonMode(GL_BACK, GL_FILL);
+
+  if (showNormals) {
+    glColor3f(0.0, 1.0, 0.0);
+    glBegin(GL_LINES);
+    for (int i = 0; i < rigid_object->displaced_mesh.faces.size(); ++i) {
+      Face face = rigid_object->displaced_mesh.faces[i];
+      for (int j = 0; j < 3; ++j) {
+        glVertex3f((GLfloat) face.v[j]->position->x, (GLfloat) face.v[j]->position->y,
+                   (GLfloat) face.v[j]->position->z);
+        glVertex3f((GLfloat) (face.v[j]->position->x + face.v[j]->normal->x),
+                   (GLfloat) (face.v[j]->position->y + face.v[j]->normal->y),
+                   (GLfloat) (face.v[j]->position->z + face.v[j]->normal->z));
+      }
+    }
+    glEnd();
+    glColor3f(0.0, 0.0, 0.0);
+  }
+}
+
+void drawMesh() {
+  glUseProgram(rigid_object->shader->program);
+  glBegin(GL_TRIANGLES);
+  for (int i = 0; i < rigid_object->displaced_mesh.faces.size(); ++i) {
+    Face face = rigid_object->displaced_mesh.faces[i];
+    for (int j = 0; j < 3; ++j) {
+      glNormal3f((GLfloat) face.v[j]->normal->x, (GLfloat) face.v[j]->normal->y, (GLfloat) face.v[j]->normal->z);
+      glVertex3f((GLfloat) face.v[j]->position->x, (GLfloat) face.v[j]->position->y, (GLfloat) face.v[j]->position->z);
+    }
+  }
+  glEnd();
+  glUseProgram(0);
 }
 
 void perspDisplay() {
@@ -198,10 +229,16 @@ void perspDisplay() {
   if (showReferenceGrid)
     drawReferenceGrid();
 
-  drawMesh();
+  if (showDebugMode) {
+    drawReferenceGrid();
+    drawMeshDebug();
 
-  if (!first_run) {
-    drawDebug();
+    if (!first_run) {
+      drawDebug();
+    }
+  }
+  else {
+    drawMesh();
   }
 
   first_run = false;
@@ -232,20 +269,6 @@ void motionEventHandler(int x, int y) {
 
 void keyboardEventHandler(unsigned char key, int x, int y) {
   switch (key) {
-//    case 'r': case 'R':
-//      // render the particles
-//      showReferenceGrid = false;
-//      initCameraRender();
-//      ;
-//      break;
-//
-//    case 'd': case 'D':
-//      // render the particles
-//      showReferenceGrid = true;
-//      initCameraDebug();
-//      ;
-//      break;
-
     case 'w': case 'W':
       user_acceleration = Vector3d(0.0, 0.0, -1.0 * user_accel_magnitude);
       break;
@@ -267,12 +290,13 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
       ;
       break;
 
-    case 'l': case 'L':
-      // render the particles as lines
+    case 'r': case 'R':
+      showDebugMode = !showDebugMode;
       ;
       break;
 
-    case 'v': case 'V':
+    case 'n': case 'N':
+      showNormals = !showNormals;
       ;
       break;
 
@@ -301,7 +325,7 @@ bool readParameters(char *paramfile_name) {
     // read through the file
     while (getline(paramfile_stream, line)) {
 
-      if (line.compare("SPRINGY OBJECT:") == 0) {
+      if (line.compare("RIGID OBJECT:") == 0) {
         double mass;
         unsigned int pin_vertex_index;
         std::string obj_filename;
@@ -422,7 +446,9 @@ int main(int argc, char *argv[]) {
   glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
   glutInitWindowSize(WIDTH, HEIGHT);
   glutInitWindowPosition(50, 50);
-  int persp_win = glutCreateWindow("Simulating A Squishy Mesh");
+  int persp_win = glutCreateWindow("Simulating A Rigid Body");
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_MULTISAMPLE_ARB);
 
   // read the parameters
   readParameters(argv[1]);

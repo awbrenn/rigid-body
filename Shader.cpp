@@ -48,12 +48,6 @@ unsigned int Shader::loadShaders(char* frag, char* vert) {
   glCompileShader(v);
   glCompileShader(f);
 
-  p = glCreateProgram();
-  if (p == 0) {std::cerr << "Failed to create program" << std::endl; exit(EXIT_FAILURE);}
-  glAttachShader(p,f);
-  glAttachShader(p,v);
-  glLinkProgram(p);
-
   // print out any erros with shaders
   GLsizei lengthf;
   GLchar infologf[10000];
@@ -64,6 +58,12 @@ unsigned int Shader::loadShaders(char* frag, char* vert) {
   GLchar infologv[10000];
   glGetShaderInfoLog(v, 10000, &lengthv, infologv);
   std::cout << "Vert shader compilation: " << lengthv << "\n" << infologv << std::endl;
+
+  p = glCreateProgram();
+  if (p == 0) { std::cerr << "Failed to create program" << std::endl; exit(EXIT_FAILURE); }
+  glAttachShader(p,f);
+  glAttachShader(p,v);
+  glLinkProgram(p);
 
   // print out errors with linking
   GLint link_status;
