@@ -5,8 +5,8 @@
 #include "RigidObject.h"
 
 RigidObject::RigidObject(std::string obj_filename, std::string frag_shader_filename, std::string vert_shader_filename,
-                         double Mass, unsigned int Pinned_vertex_index) : Object(obj_filename, frag_shader_filename,
-                                                                                 vert_shader_filename) {
+                         std::string diffuse_texture_filename, double Mass, unsigned int Pinned_vertex_index)
+        : Object(obj_filename, frag_shader_filename, vert_shader_filename, diffuse_texture_filename) {
 
   mass = Mass;
   pinned_vertex_index = Pinned_vertex_index;

@@ -5,8 +5,8 @@
 
 #include "Shader.h"
 
-Shader::Shader(char *frag, char *vert) {
-  program = loadShaders(frag, vert);
+Shader::Shader(char *frag, char *vert, char *diffuse_texture) {
+  program = loadShaders(frag, vert, diffuse_texture);
 }
 
 void load_diffuse_texture(char *filename) {
@@ -34,6 +34,7 @@ void load_diffuse_texture(char *filename) {
   texture_bytes = (unsigned char *)calloc(3,im_size);
   fread(texture_bytes,3,im_size,fptr);
   fclose(fptr);
+
 
   glBindTexture(GL_TEXTURE_2D,0);
   glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,im_width,im_height,0,GL_RGB,
@@ -64,7 +65,7 @@ void Shader::setUniformParameter(unsigned int p, char* varName, unsigned int val
   glUniform1i(location, value);
 }
 
-unsigned int Shader::loadShaders(char* frag, char* vert) {
+unsigned int Shader::loadShaders(char *frag, char *vert, char *diffuse_texture) {
   char *vs, *fs;
   GLuint v, f, p;
 
@@ -111,7 +112,7 @@ unsigned int Shader::loadShaders(char* frag, char* vert) {
       exit(EXIT_FAILURE);
   }
 
-  load_diffuse_texture((char *) "/home/awbrenn/Documents/workspace/physanim/5/dhouse_diffuse.ppm");
+  load_diffuse_texture(diffuse_texture);
 
   glUseProgram(p);
   setUniformParameter(p, (char *) "myDiffuse", 0);

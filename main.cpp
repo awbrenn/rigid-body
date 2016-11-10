@@ -349,6 +349,7 @@ bool readParameters(char *paramfile_name) {
         std::string obj_filename;
         std::string frag_shader_filename;
         std::string vert_shader_filename;
+        std::string diffuse_texture_filename;
         // skip a line
         getline(paramfile_stream, line);
 
@@ -366,7 +367,7 @@ bool readParameters(char *paramfile_name) {
         object_stream.str(line);
         object_stream.clear();
 
-        object_stream >> frag_shader_filename >> vert_shader_filename;
+        object_stream >> frag_shader_filename >> vert_shader_filename >> diffuse_texture_filename;
 
         // skip a line
         getline(paramfile_stream, line);
@@ -381,7 +382,8 @@ bool readParameters(char *paramfile_name) {
 //        std::cout << "mass: " << mass << " k: " << spring_constant << " d: " << damping_constant << std::endl;
 
         // TODO add rigid_index_number to parameters
-        rigid_object = new RigidObject(obj_filename, frag_shader_filename, vert_shader_filename, mass, pin_vertex_index);
+        rigid_object = new RigidObject(obj_filename, frag_shader_filename, vert_shader_filename, diffuse_texture_filename, mass,
+                                       pin_vertex_index);
       }
 
       else if (line.compare("SOLVER:") == 0) {

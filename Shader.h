@@ -23,12 +23,12 @@ class Shader {
   private:
     char* readShaderProgram(char* filename);
     void setUniformParameter(unsigned int p, char* varName, unsigned int value);
-    unsigned int loadShaders(char* vert, char* frag);
+    unsigned int loadShaders(char *vert, char *frag, char *diffuse_texture);
 
   public:
     GLuint program;
 
-    Shader(char* vert, char* frag);
+    Shader(char *vert, char *frag, char *diffuse_texture);
 };
 
 

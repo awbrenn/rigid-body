@@ -1,10 +1,10 @@
 **Author:** Austin Brennan  
-**Date:** 10/24/2016  
+**Date:** 11/09/2016  
 **Course:** [CPSC 8170 - Physically Based Animation (Dr. Donald House)](https://people.cs.clemson.edu/~dhouse/courses/817/)    
 **Institution:** Clemson University  
 **Repository:** https://github.com/awbrenn/rigid-body
 
-# Squishy Mesh
+# Rigid Body
 A rigid object that is connected to a springy string rendered in OpenGL.
 
 ## Assignment
@@ -19,7 +19,6 @@ cause it to bounce around and induce rotations.
 
 ##Features
 * Obj loader for arbitrary mesh
-* Ability to interact with the object
 
 ## Compilation
 ```
@@ -35,7 +34,6 @@ $> RigidBody parameters
 
 ## Interaction
 ```
-w/a/s/d - move the ball around
 g       - Toggle grid
 esc     - Quit the program
 q       - Quit the program

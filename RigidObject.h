@@ -19,7 +19,7 @@ class RigidObject : public Object {
     Mesh displaced_mesh; // a mesh that is displaced by the simulation
 
     RigidObject(std::string obj_filename, std::string frag_shader_filename, std::string vert_shader_filename,
-                    double Mass, unsigned int Pinned_vertex_index);
+                    std::string diffuse_texture_filename, double Mass, unsigned int Pinned_vertex_index);
 
     void convertStateVectorToMesh();
     Vector3d getPinPosition();
