@@ -92,7 +92,7 @@ void initCameraDebug() {
                       Vector3d(0, 1, 0));
 
   // grey background for window
-  glClearColor(0.62, 0.62, 0.62, 0.0f);
+  glClearColor(0.0, 0.0, 0.0, 0.0f);
 //  glClearColor(0.0, 0.0, 0.0, 0.0f);
   glShadeModel(GL_SMOOTH);
   glDepthRange(0.0f, 1.0f);
