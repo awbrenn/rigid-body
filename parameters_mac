@@ -1,0 +1,22 @@
+RIGID OBJECT:
+        obj path and filename
+        /Users/AustinBrennan/Documents/workspace/physanim/rigid-body/box.obj
+
+        fragment shader                                                 vertex shader                                             texture path
+        /Users/AustinBrennan/Documents/workspace/physanim/rigid-body/shader.frag    /Users/AustinBrennan/Documents/workspace/physanim/rigid-body/shader.vert  /Users/AustinBrennan/Documents/workspace/physanim/rigid-body/box_diffuse.ppm
+
+        mass (m) [kg], pin vertex (index of the vertex position to pin)
+                  0.2          5
+
+SOLVER:
+        timestep (change in time between each simulation step), substeps (number of times the solver is run per render)
+           0.01                                                        5
+
+        integrator (choose from LEAPFROG and SIXTH)
+            RK4
+
+        ground level, spring constant (k) [N/m], line length [m], line anchor point (x y z) [m]
+                0.0                        13.0              2.5                    0.0 10.0 0.0
+
+        magnitude of user acceleration
+                                  13.0

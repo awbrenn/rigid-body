@@ -92,7 +92,7 @@ void initCameraDebug() {
                       Vector3d(0, 1, 0));
 
   // grey background for window
-  glClearColor(0.0, 0.0, 0.0, 0.0f);
+  glClearColor(0.65, 0.65, 0.65, 1.0f);
 //  glClearColor(0.0, 0.0, 0.0, 0.0f);
   glShadeModel(GL_SMOOTH);
   glDepthRange(0.0f, 1.0f);
@@ -224,7 +224,7 @@ void drawMesh() {
   for (int i = 0; i < rigid_object->displaced_mesh.faces.size(); ++i) {
     Face face = rigid_object->displaced_mesh.faces[i];
     for (int j = 0; j < 3; ++j) {
-      glTexCoord2f((GLfloat) face.v[j]->uv->x, (GLfloat) face.v[j]->uv->y);
+      glTexCoord2f((GLfloat) face.v[j]->uv->x, (GLfloat) (1.0 - face.v[j]->uv->y));
       glNormal3f((GLfloat) face.v[j]->normal->x, (GLfloat) face.v[j]->normal->y, (GLfloat) face.v[j]->normal->z);
       glVertex3f((GLfloat) face.v[j]->position->x, (GLfloat) face.v[j]->position->y, (GLfloat) face.v[j]->position->z);
     }
